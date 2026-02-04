@@ -27,14 +27,14 @@ const GAME_CONFIG = {
     groundHeight: 100,
 
     // Jump mechanics
-    minJumpPower: 150,
-    maxJumpPower: 500,
-    powerScale: 2,      // mouse distance / powerScale = launch power
+    minJumpPower: 300,
+    maxJumpPower: 1200,
+    powerScale: 0.8,    // mouse distance / powerScale = launch power (lower = more power)
 
     // Trajectory preview
-    trajectoryDots: 30,         // Increased from 20 for longer arcs
-    trajectoryTimeStep: 0.05,   // Seconds per step
-    trajectoryDotRadius: 4,
+    trajectoryDots: 50,         // More dots for longer arcs
+    trajectoryTimeStep: 0.04,   // Seconds per step (2 seconds total preview)
+    trajectoryDotRadius: 5,
 
     // Feedback
     feedbackDuration: 1000,     // Milliseconds before feedback fades
@@ -46,8 +46,8 @@ const GAME_CONFIG = {
     targetColor: 0xE74C3C,      // Red
     targetOutline: 0x922B21,    // Dark red
     groundColor: 0x8B4513,      // Brown
-    trajectoryColor: 0xFFFFFF,  // White
-    trajectoryAlpha: 0.5,
+    trajectoryColor: 0xFFFF00,  // Yellow (visible against sky)
+    trajectoryAlpha: 0.9,
     successColor: '#2ECC71',    // Green (CSS format for text)
     missColor: '#E74C3C'        // Red (CSS format for text)
 };
