@@ -33,6 +33,7 @@ class GameScene extends Phaser.Scene {
     create() {
         // Create game objects
         this.createGround();
+        this.createPlatforms();
         this.createPlayer();
         this.createTarget();
         this.createUI();
@@ -62,6 +63,7 @@ class GameScene extends Phaser.Scene {
         if (this.playerState === PlayerState.JUMPING) {
             this.updateJump(dt);
             this.checkTargetCollision();
+            this.checkPlatformCollision();
             this.checkGroundCollision();
         }
 
@@ -84,6 +86,34 @@ class GameScene extends Phaser.Scene {
             GAME_CONFIG.groundHeight,
             GAME_CONFIG.groundColor
         );
+    }
+
+    createPlatforms() {
+        this.platforms = [];
+
+        // Create stepping stone platforms
+        for (const platformData of GAME_CONFIG.platforms) {
+            const platform = this.add.rectangle(
+                platformData.x,
+                platformData.y,
+                platformData.width,
+                platformData.height,
+                GAME_CONFIG.platformColor
+            );
+            platform.setStrokeStyle(2, GAME_CONFIG.platformOutline);
+            this.platforms.push(platform);
+        }
+
+        // Create target platform (where target sits)
+        this.targetPlatform = this.add.rectangle(
+            GAME_CONFIG.targetPlatformX,
+            GAME_CONFIG.targetPlatformY,
+            GAME_CONFIG.targetPlatformWidth,
+            GAME_CONFIG.targetPlatformHeight,
+            GAME_CONFIG.platformColor
+        );
+        this.targetPlatform.setStrokeStyle(2, GAME_CONFIG.platformOutline);
+        this.platforms.push(this.targetPlatform);
     }
 
     createPlayer() {
@@ -336,6 +366,40 @@ class GameScene extends Phaser.Scene {
         }
     }
 
+    checkPlatformCollision() {
+        // Only check when falling
+        if (this.velocityY <= 0) return;
+
+        const playerRadius = GAME_CONFIG.playerRadius;
+
+        for (const platform of this.platforms) {
+            const platBounds = platform.getBounds();
+
+            // Check if player is within horizontal bounds of platform
+            if (this.player.x >= platBounds.left - playerRadius &&
+                this.player.x <= platBounds.right + playerRadius) {
+
+                // Check if player is landing on top of platform
+                const platformTop = platBounds.top;
+                const playerBottom = this.player.y + playerRadius;
+
+                // Landing detection: player's bottom crossing platform top
+                if (playerBottom >= platformTop && playerBottom <= platformTop + 20) {
+                    // Snap to platform
+                    this.player.y = platformTop - playerRadius;
+
+                    // Stop movement
+                    this.velocityX = 0;
+                    this.velocityY = 0;
+
+                    // Change state
+                    this.playerState = PlayerState.LANDED;
+                    return;
+                }
+            }
+        }
+    }
+
     checkGroundCollision() {
         const groundLevel = GAME_CONFIG.groundY - GAME_CONFIG.playerRadius;
 
@@ -372,8 +436,8 @@ class GameScene extends Phaser.Scene {
             GAME_CONFIG.targetFlattenedHeight
         );
 
-        // Adjust position so bottom stays on ground
-        this.target.y = GAME_CONFIG.groundY - GAME_CONFIG.targetFlattenedHeight / 2;
+        // Adjust position so bottom stays on target platform
+        this.target.y = GAME_CONFIG.targetPlatformY - GAME_CONFIG.targetPlatformHeight / 2 - GAME_CONFIG.targetFlattenedHeight / 2;
     }
 
     showFeedback(message, color) {

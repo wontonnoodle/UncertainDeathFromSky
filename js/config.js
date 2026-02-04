@@ -17,14 +17,28 @@ const GAME_CONFIG = {
     playerRadius: 30,
 
     // Target (square) properties
-    targetX: 600,
-    targetY: 480,       // FIX: Center position: groundY - (targetSize/2) = 500 - 20
+    targetX: 700,
+    targetY: 260,       // On a high platform: platformY - (targetSize/2) = 280 - 20
     targetSize: 40,
     targetFlattenedHeight: 10,
+
+    // Target platform (where target sits)
+    targetPlatformX: 680,
+    targetPlatformY: 280,
+    targetPlatformWidth: 120,
+    targetPlatformHeight: 20,
 
     // Ground
     groundY: 500,       // Top surface of ground
     groundHeight: 100,
+
+    // Platforms (stepping stones to reach target)
+    platforms: [
+        { x: 350, y: 420, width: 100, height: 20 },  // Lower platform
+        { x: 520, y: 340, width: 100, height: 20 }   // Higher platform
+    ],
+    platformColor: 0x654321,      // Darker brown
+    platformOutline: 0x3D2314,    // Even darker brown
 
     // Jump mechanics
     minJumpPower: 300,
