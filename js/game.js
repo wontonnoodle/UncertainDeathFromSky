@@ -228,8 +228,10 @@ class GameScene extends Phaser.Scene {
         const gravity = GAME_CONFIG.gravity;
         const steps = GAME_CONFIG.trajectoryDots;
         const timeStep = GAME_CONFIG.trajectoryTimeStep;  // Seconds
+        const groundLevel = GAME_CONFIG.groundY - GAME_CONFIG.playerRadius;
 
-        for (let i = 0; i < steps; i++) {
+        // Start from i=1 to skip the starting position (which is at ground level)
+        for (let i = 1; i <= steps; i++) {
             const time = i * timeStep;
 
             // Kinematic equations: x = x0 + vx*t, y = y0 + vy*t + 0.5*g*t^2
@@ -237,9 +239,9 @@ class GameScene extends Phaser.Scene {
             const y = startY + velocityY * time + 0.5 * gravity * time * time;
 
             // Stop if trajectory goes below ground level
-            if (y >= GAME_CONFIG.groundY - GAME_CONFIG.playerRadius) {
+            if (y >= groundLevel) {
                 // Add the ground intersection point
-                points.push({ x, y: GAME_CONFIG.groundY - GAME_CONFIG.playerRadius });
+                points.push({ x, y: groundLevel });
                 break;
             }
 
@@ -337,7 +339,9 @@ class GameScene extends Phaser.Scene {
     checkGroundCollision() {
         const groundLevel = GAME_CONFIG.groundY - GAME_CONFIG.playerRadius;
 
-        if (this.player.y >= groundLevel) {
+        // Only check ground collision when falling (velocityY > 0)
+        // This allows the player to launch upward from ground level
+        if (this.velocityY > 0 && this.player.y >= groundLevel) {
             // Snap to ground
             this.player.y = groundLevel;
 
